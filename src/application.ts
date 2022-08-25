@@ -1,12 +1,14 @@
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
+import {RepositoryMixin} from '@loopback/repository';
+import {RestApplication} from '@loopback/rest';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
-import {RepositoryMixin} from '@loopback/repository';
-import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
+import * as dotenv from 'dotenv';
+import * as dotenvExt from 'dotenv-extended';
 import path from 'path';
 import {MySequence} from './sequence';
 
@@ -16,8 +18,14 @@ export class JustForFunLoopback4Application extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
   constructor(options: ApplicationConfig = {}) {
-    super(options);
+    dotenv.config();
+    dotenvExt.load({
+      schema: '.env',
+      errorOnMissing: process.env.NODE_ENV !== 'test',
+      includeProcessEnv: true,
+    });
 
+    super(options);
     // Set up the custom sequence
     this.sequence(MySequence);
 
